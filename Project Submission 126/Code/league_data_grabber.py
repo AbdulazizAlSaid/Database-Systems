@@ -2,14 +2,14 @@ from riotwatcher import LolWatcher
 import mysql.connector
 
 # Connect to the Riot API
-api_key = 'RGAPI-5ee9ba0f-7578-42bb-8e63-a4bf62fbdb66'
+api_key = 'Riot_Api_Key'
 watcher = LolWatcher(api_key)
 
 # Connect to the MySQL database
-db_host = 'localhost'
-db_name = 'league_data'
-db_user = 'root'
-db_password = 'LudensEkko786!'
+db_host = 'host'
+db_name = 'dbname'
+db_user = 'user'
+db_password = 'password'
 db = mysql.connector.connect(host=db_host, user=db_user, password=db_password, database=db_name)
 cursor = db.cursor()
 
