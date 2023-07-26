@@ -1,0 +1,95 @@
+Queries:
+
+1. Finds all players who played panthon and group by region order by damage
+SELECT Player.player_name, 
+       Region.region_name, 
+       Player_Match_Stats.team_id, 
+       Player_Match_Stats.team_name, 
+       Player_Match_Stats.team_position, 
+       Player_Match_Stats.kills, 
+       Player_Match_Stats.deaths, 
+       Player_Match_Stats.assists, 
+       Player_Match_Stats.gold_earned, 
+       Player_Match_Stats.damage_dealt, 
+       Player_Match_Stats.objective_damage_dealt, 
+       Player_Match_Stats.minions_killed, 
+       Player_Match_Stats.neutral_minions_killed
+FROM Player_Match_Stats
+JOIN Champion ON Player_Match_Stats.champion_id = Champion.champion_id
+JOIN Player ON Player_Match_Stats.puuid = Player.puuid
+JOIN Region ON Player.region_id = Region.region_id
+WHERE Champion.champion_name = 'Pantheon'
+ORDER BY Player_Match_Stats.damage_dealt DESC;
+
+----------------------------------
+2.  TAKES PLAYERS AND ORDERS BY LP
+SELECT 
+  p.player_name, 
+  r.region_name, 
+  p.league_points, 
+  SUM(p.wins + p.losses) AS total_games_played,
+  SUM(p.wins) AS total_wins,
+  SUM(p.losses) AS total_losses
+FROM 
+  Player p 
+  JOIN Region r ON p.region_id = r.region_id 
+GROUP BY 
+  p.player_name, 
+  r.region_name, 
+  p.league_points 
+ORDER BY 
+  p.league_points DESC;
+
+--------------------------------------------------------------------
+3.TAKES PLAYERS AND ORDER BY WINS
+SELECT 
+  p.player_name, 
+  r.region_name, 
+  p.league_points, 
+  SUM(p.wins) AS total_wins,
+  SUM(p.losses) AS total_losses 
+FROM 
+  Player p 
+  JOIN Region r ON p.region_id = r.region_id 
+GROUP BY 
+  p.player_name, 
+  r.region_name, 
+  p.league_points 
+ORDER BY 
+  total_wins DESC;
+
+---------------------------------------------------------------------
+4. Takes top 100 players by LP and counts which regions theyre from
+SELECT 
+  r.region_name, 
+  COUNT(*) AS player_count 
+FROM 
+  (SELECT * FROM Player ORDER BY league_points DESC LIMIT 100) p 
+  JOIN Region r ON p.region_id = r.region_id 
+GROUP BY 
+  r.region_name;
+----------------------------------------------------------------------------
+5. Same as above but just sorts by wins instead
+SELECT 
+  r.region_name, 
+  COUNT(*) AS player_count 
+FROM 
+  (SELECT * FROM Player ORDER BY wins DESC LIMIT 100) p 
+  JOIN Region r ON p.region_id = r.region_id 
+GROUP BY 
+  r.region_name;
+-------------------------------------------------------------------------
+6. Takes average player stats across all games and orders them by LP
+SELECT p.player_name, p.league_points, 
+    AVG(pms.kills) AS avg_kills, 
+    AVG(pms.deaths) AS avg_deaths, 
+    AVG(pms.assists) AS avg_assists, 
+    AVG(pms.damage_dealt) AS avg_damage_dealt, 
+    AVG(pms.minions_killed) AS avg_minions_killed, 
+    AVG(pms.gold_earned) AS avg_gold_earned, 
+    AVG(pms.objective_damage_dealt) AS avg_objective_damage_dealt 
+FROM Player p 
+INNER JOIN Player_Match_Stats pms 
+    ON p.puuid = pms.puuid 
+GROUP BY p.player_name, p.league_points 
+ORDER BY p.league_points DESC;
